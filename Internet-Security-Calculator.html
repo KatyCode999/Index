@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <title>🔐 Calculadora del teu ús d'Internet</title>
+  <style>
+    body {
+      background-image: url("https://lh3.googleusercontent.com/d/1tiQcChb9SFam7PooNmLmfKJ30HrsAJJv");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+
+    h1 {
+      color: #ffffff;
+      margin-top: 30px;
+      background-color: #0400ff9d;
+      border-radius: 100px;
+      padding: 20px 30px;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin: 30px 0 5px;
+      color: #ffffff;
+      margin-left: 470px;
+    }
+
+    input, select {
+      width: 300px;
+      padding: 6px;
+      margin-bottom: 10px;
+      color: #000000;
+      margin-right: 30px;
+    }
+
+    button {
+      margin-top: 30px;
+      padding: 30px 30px;
+      background: #0400ff4f;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 100px;
+      display: block;
+      margin-left: 500px;
+    }
+
+    .result {
+      margin-top: 20px;
+      font-weight: bold;
+      padding: 15px;
+      border-radius: 6px;
+    }
+
+    .high { background-color: #d4edda; color: #155724; }
+    .medium { background-color: #fff3cd; color: #856404; }
+    .low { background-color: #f8d7da; color: #721c24; }
+
+    select {
+      color: #ffffff;
+      background: linear-gradient(45deg, rgba(4, 0, 255, 0.719), rgba(0, 255, 242, 0.616));
+      margin-left: 470px;
+    }
+
+    input {
+      color: #ffffff;
+      background: linear-gradient(45deg, rgba(4, 0, 255, 0.719), rgba(0, 255, 242, 0.616));
+      margin-left: 470px;
+    }
+
+    option {
+      background-color: #000000;
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔐 Calculadora del teu ús d'Internet</h1>
+  <form id="securityForm">
+    <label>1️⃣ Durant quant de temps utilitzes Internet diàriament (hores)?</label>
+    <input type="number" id="internetUse" min="1" required>
+
+    <label>2️⃣ Tens un antivirus instal·lat?</label>
+    <select id="antivirus">
+      <option value="">-- Selecciona --</option>
+      <option value="si">Sí</option>
+      <option value="no">No</option>
+      <option value="no ho sé">No ho sé</option>
+    </select>
+
+    <label>3️⃣ Surts del teu compte d'Internet?</label>
+    <select id="logout">
+      <option value="">-- Selecciona --</option>
+      <option value="si">Sí</option>
+      <option value="no">No</option>
+    </select>
+
+    <label>4️⃣ Has experimentat alguna amenaça?</label>
+    <select id="threat">
+      <option value="">-- Selecciona --</option>
+      <option value="no">No</option>
+      <option value="1-2">1-2 vegades</option>
+      <option value="3-4">3-4 vegades</option>
+      <option value="5+">5 o més</option>
+    </select>
+
+    <label>5️⃣ Introdueix una contrasenya que creguis que és segura:</label>
+    <input type="text" id="password" required>
+
+    <label>6️⃣ Tens xarxes socials?</label>
+    <select id="hasSocialMedia">
+      <option value="">-- Selecciona --</option>
+      <option value="si">Sí</option>
+      <option value="no">No</option>
+    </select>
+
+    <div id="accountTypeContainer" style="display:none;">
+      <label>Quin tipus de compte tens?</label>
+      <select id="accountType">
+        <option value="">-- Selecciona --</option>
+        <option value="public">Públic</option>
+        <option value="private">Privat</option>
+      </select>
+    </div>
+
+    <label>7️⃣ Saps què és el 2FA?</label>
+    <select id="knows2fa">
+      <option value="">-- Selecciona --</option>
+      <option value="no">No</option>
+      <option value="si">Sí</option>
+    </select>
+
+    <div id="2faDetails" style="display:none;">
+      <label>Quants comptes actius tens?</label>
+      <input type="number" id="totalAccounts" min="1">
+
+      <label>En quants tens activat el 2FA?</label>
+      <input type="number" id="enabled2fa" min="0">
+    </div>
+
+    <button type="submit">Comprova la meva seguretat</button>
+  </form>
+
+  <div id="result" class="result"></div>
+
+<script>
+  const form = document.getElementById("securityForm");
+  const knows2fa = document.getElementById("knows2fa");
+  const hasSocialMedia = document.getElementById("hasSocialMedia");
+  const accountTypeContainer = document.getElementById("accountTypeContainer");
+  const resultBox = document.getElementById("result");
+
+  const COMMON_PASSWORDS = [/* ... truncated for brevity ... */];
+
+  function isSecurePassword(pw) {
+    return (
+      pw.length >= 12 &&
+      /[A-Z]/.test(pw) &&
+      /[a-z]/.test(pw) &&
+      /\d/.test(pw) &&
+      /[!@#$%^&*(),.?":{}|<>]/.test(pw) &&
+      !COMMON_PASSWORDS.includes(pw.toLowerCase())
+    );
+  }
+
+  knows2fa.addEventListener("change", () => {
+    document.getElementById("2faDetails").style.display = knows2fa.value === "si" ? "block" : "none";
+  });
+
+  hasSocialMedia.addEventListener("change", () => {
+    accountTypeContainer.style.display = hasSocialMedia.value === "si" ? "block" : "none";
+  });
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const H = parseInt(document.getElementById("internetUse").value);
+    const rH = H / 2;
+    const antivirus = document.getElementById("antivirus").value;
+    const logout = document.getElementById("logout").value;
+    const threat = document.getElementById("threat").value;
+    const password = document.getElementById("password").value;
+    const hasSocial = hasSocialMedia.value;
+    const knows = knows2fa.value;
+
+    let rS = antivirus === "si" ? 22.2 : 0;
+    let rU = logout === "si" ? 11.1 : 0;
+
+    let rA = 0;
+    if (threat === "no") rA = 22.2;
+    else if (threat === "1-2") rA = 11.1;
+    else if (threat === "3-4") rA = 5.55;
+    else if (threat === "5+") rA = 0;
+
+    let rC = isSecurePassword(password) ? 22.2 : 0;
+
+    let rR = 0;
+    if (hasSocial === "no") {
+      rR = 11.1;
+    } else if (hasSocial === "si") {
+      const accType = document.getElementById("accountType").value;
+      if (accType === "private") rR = 5.55;
+      else if (accType === "public") rR = 0;
+      else {
+        alert("Si tens xarxes socials, cal indicar si el compte és públic o privat.");
+        return;
+      }
+    }
+
+    let rTFA = 0;
+    if (knows === "si") {
+      const total = parseInt(document.getElementById("totalAccounts").value);
+      const enabled = parseInt(document.getElementById("enabled2fa").value);
+      if (isNaN(total) || total <= 0 || isNaN(enabled) || enabled < 0 || enabled > total) {
+        alert("Comptes actius o 2FA no vàlids.");
+        return;
+      }
+      rTFA = Math.min((enabled / total) * 22.2, 22.2);
+    }
+
+    const raw_score = rS + rU + rA + rC + rR + rTFA;
+
+    let score;
+    if (rC === 0) {
+      score = raw_score - 10;
+    } else {
+      score = Math.min((raw_score / (rH * 0.5)), 100);
+    }
+
+    score = Math.max(score, 0);
+    score = Math.round(score * 100) / 100;
+
+    let message = "", style = "";
+
+    if (score >= 90) {
+      message = "🎉 Excel·lent! Tens molt bona seguretat digital. Mantens pràctiques saludables com tenir contrasenyes fortes, fer servir 2FA i evitar comptes socials públics. Continua així!";
+      style = "high";
+    } else if (score >= 60) {
+      message = "🔐 Bona feina! La teva seguretat és força bona, però hi ha àrees per millorar. Revisa si tens contrasenyes prou segures, activa el 2FA als comptes principals i assegura't que les teves xarxes socials són privades.";
+      style = "medium";
+    } else if (score >= 30) {
+      message = "⚠️ Compte! Hi ha diverses àrees en què la teva seguretat pot millorar: potser tens contrasenyes dèbils, no utilitzes antivirus, no tancar les sessions o tens comptes socials públics. Fes una revisió!";
+      style = "medium";
+    } else {
+      message = "🚨 Molt baix! La teva seguretat digital és molt preocupant. Segurament no tens contrasenyes segures, ni antivirus, ni coneixes el 2FA, i has estat exposat a amenaces. Et recomanem revisar totes les teves pràctiques digitals immediatament.";
+      style = "low";
+    }
+
+    resultBox.className = "result " + style;
+    resultBox.innerHTML = `🔒 La teva seguretat a Internet és del <strong>${score}%</strong><br>${message}`;
+
+    // Envia el resultat al full de càlcul
+    fetch("https://script.google.com/a/macros/sarria.epiaedu.cat/s/AKfycbzGeepxoqV4afBhoLK109iW1dWPenAzrC361HrULsmL3C55ta9DrRBbyegwbxe2pDdi/exec", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/x-www-form-urlencoded"
+  },
+  body: `score=${encodeURIComponent(score)}`
+})
+.then(response => response.text())
+.then(data => {
+  console.log("Data sent to Google Sheet:", data);
+})
+.catch(error => {
+  console.error("Error sending to Google Sheet:", error);
+});
+</script>
+</body>
+</html>
