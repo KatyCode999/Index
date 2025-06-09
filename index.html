@@ -253,7 +253,7 @@
     resultBox.innerHTML = `🔒 La teva seguretat a Internet és del <strong>${score}%</strong><br>${message}`;
 
     // Envia el resultat al full de càlcul
-    fetch("https://script.google.com/a/macros/sarria.epiaedu.cat/s/AKfycbzGeepxoqV4afBhoLK109iW1dWPenAzrC361HrULsmL3C55ta9DrRBbyegwbxe2pDdi/exec", {
+    fetch("https://script.google.com/macros/s/AKfycbxFol10QIzo0D5jHKfde_Zy0C4A63-QEAPV4yG4WXXOIBQTedg2mlYKhUUmDMQ6y-7g/exec", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: `score=${encodeURIComponent(score)}`
